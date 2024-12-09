@@ -21,7 +21,7 @@ def to_excel(df):
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     df.to_excel(writer, index=False, sheet_name='Sheet1')
-    writer.save()
+    writer._save()
     processed_data = output.getvalue()
     return processed_data
 
@@ -77,7 +77,7 @@ def main():
         st.write("Quantos dias faz que o cliente fez a sua última compra?")
         df_recencia = df_compras.groupby(by='ID_cliente', as_index=False)['DiaCompra'].max()
         df_recencia.columns = ['ID_cliente', 'DiaUltimaCompra']
-        df_recencia['recencia'] = df_recencia['DiaUltimaCompra'].apply(lambda x: (dia_atual - x).days)
+        df_recencia['Recencia'] = df_recencia['DiaUltimaCompra'].apply(lambda x: (dia_atual - x).days)
         st.write(df_recencia.head())
 
         df_recencia.drop(['DiaUltimaCompra'], axis=1, inplace=True)
@@ -105,7 +105,7 @@ def main():
         quartis = df_rfv.quantile([0.25, 0.50, 0.75])
         st.write(quartis)
 
-        df_rfv['R_Quartile'] = df_rfv['recencia'].apply(recencia_class, args=('recencia', quartis))
+        df_rfv['R_Quartile'] = df_rfv['Recencia'].apply(recencia_class, args=('Recencia', quartis))
         df_rfv['F_Quartile'] = df_rfv['Frequencia'].apply(freq_val_class, args=('Frequencia', quartis))
         df_rfv['V_Quartile'] = df_rfv['Valor'].apply(freq_val_class, args=('Valor', quartis))
         df_rfv['RFV_Score'] = df_rfv['R_Quartile'] + df_rfv['F_Quartile'] + df_rfv['V_Quartile']
@@ -117,14 +117,14 @@ def main():
         st.write("#### Clientes com menor recência, maior frequência e maior valor gasto:")
         st.write(df_rfv[df_rfv['RFV_Score'] == 'AAA'].sort_values('Valor', ascending=False).head(10))
 
-        st.write("### Ações de marketing/CRM")
+        st.write("### acoes de marketing/CRM")
         dict_acoes = {
             'AAA': 'Enviar cupons de desconto, pedir para indicar nosso produto para algum amigo.',
             'DDD': 'Churn! Clientes que gastaram bem pouco e fizeram poucas compras, fazer nada.',
             'DAA': 'Churn! Clientes que gastaram bastante e fizeram muitas compras, enviar cupons de desconto para tentar recuperar.',
             'CAA': 'Churn! Clientes que gastaram bastante e fizeram muitas compras, enviar cupons de desconto para tentar recuperar.'
         }
-        df_rfv['ações de marketing/crm'] = df_rfv['RFV_Score'].map(dict_acoes)
+        df_rfv['acoes de marketing/crm'] = df_rfv['RFV_Score'].map(dict_acoes)
         st.write(df_rfv.head())
 
         # Exportar para Excel
@@ -136,7 +136,7 @@ def main():
         )
 
         st.write("Quantidade de clientes por tipo de ação:")
-        st.write(df_rfv['ações de marketing/crm'].value_counts(dropna=False))
+        st.write(df_rfv['acoes de marketing/crm'].value_counts(dropna=False))
 
 if __name__ == '__main__':
     main()
