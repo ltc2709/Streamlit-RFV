@@ -16,15 +16,6 @@ st.set_page_config(
 def convert_df(df):
     return df.to_csv(index=False).encode('utf-8')
 
-@st.cache_data
-def to_excel(df):
-    output = BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    df.to_excel(writer, index=False, sheet_name='Sheet1')
-    writer._save()
-    processed_data = output.getvalue()
-    return processed_data
-
 def recencia_class(x, r, q_dict):
     """Classifica como melhor o menor quartil
     x = valor da linha
@@ -117,7 +108,7 @@ def main():
         st.write("#### Clientes com menor recência, maior frequência e maior valor gasto:")
         st.write(df_rfv[df_rfv['RFV_Score'] == 'AAA'].sort_values('Valor', ascending=False).head(10))
 
-        st.write("### acoes de marketing/CRM")
+        st.write("### Ações de marketing/CRM")
         dict_acoes = {
             'AAA': 'Enviar cupons de desconto, pedir para indicar nosso produto para algum amigo.',
             'DDD': 'Churn! Clientes que gastaram bem pouco e fizeram poucas compras, fazer nada.',
@@ -127,12 +118,13 @@ def main():
         df_rfv['acoes de marketing/crm'] = df_rfv['RFV_Score'].map(dict_acoes)
         st.write(df_rfv.head())
 
-        # Exportar para csv
-        df_xlsx = to_excel(df_rfv)
+        # Exportar para CSV
+        df_csv = convert_df(df_rfv)
         st.download_button(
-          label='Download Excel',
-          data=df_xlsx,
-          file_name='rfv_analysis.xlsx'
+            label='Download CSV',
+            data=df_csv,
+            file_name='rfv_analysis.csv',
+            mime='text/csv'
         )
         
         st.write("Quantidade de clientes por tipo de ação:")
