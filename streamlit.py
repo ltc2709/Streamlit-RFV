@@ -16,6 +16,8 @@ st.set_page_config(
 def convert_df(df):
     return df.to_csv(index=False).encode('utf-8')
 
+csv_data = df_rfv.to_csv(index=False)
+
 @st.cache_data
 def to_excel(df):
     output = BytesIO()
@@ -127,14 +129,14 @@ def main():
         df_rfv['acoes de marketing/crm'] = df_rfv['RFV_Score'].map(dict_acoes)
         st.write(df_rfv.head())
 
-        # Exportar para Excel
-        df_xlsx = to_excel(df_rfv)
+        # Exportar para csv
         st.download_button(
-            label='Download Excel',
-            data=df_xlsx,
-            file_name='rfv_analysis.xlsx'
+            label='Download CSV',
+            data=csv_data,
+            file_name='rfv_analysis.csv',
+            mime='text/csv'
         )
-
+        
         st.write("Quantidade de clientes por tipo de ação:")
         st.write(df_rfv['acoes de marketing/crm'].value_counts(dropna=False))
 
