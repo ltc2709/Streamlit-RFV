@@ -129,10 +129,11 @@ def main():
 
         # Exportar para csv
         df_xlsx = to_excel(df_rfv)
-         st.download_button(
-            label='Download Excel',
-            data=df_xlsx,
-            file_name='rfv_analysis.xlsx'
+        st.download_button(
+          label='Download Excel',
+          data=df_xlsx,
+          file_name='rfv_analysis.xlsx'
+        )
         
         st.write("Quantidade de clientes por tipo de ação:")
         st.write(df_rfv['acoes de marketing/crm'].value_counts(dropna=False))
